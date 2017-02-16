@@ -7,12 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by totoro-fly on 2017/2/11.
  */
 
 public class NewsAdapter extends ArrayAdapter {
-    public NewsAdapter(Context context, int textViewResourceId) {
+    public NewsAdapter(Context context, ArrayList<New.ResponseBean.ResultsBean> textViewResourceId) {
         super(context, 0, textViewResourceId);
     }
 

@@ -1,11 +1,16 @@
 package com.totoro_fly.news;
 
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -22,12 +27,29 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Bind(R.id.activity_news)
     LinearLayout activityNews;
     private static final String NEWS_URL = "http://content.guardianapis.com/search?q=debates&api-key=test";
+    NewsAdapter newsAdapter;
+    @Bind(R.id.main_progress)
+    ProgressBar mainProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
         ButterKnife.bind(this);
+        newsList.setEmptyView(emptyTextview);
+        newsAdapter = new NewsAdapter(this, new ArrayList<New.ResponseBean.ResultsBean>());
+        newsList.setAdapter(newsAdapter);
+        newsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                New.ResponseBean.ResultsBean n = (New.ResponseBean.ResultsBean) newsAdapter.getItem(i);
+                Uri uri = Uri.parse(n.getApiUrl());
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -37,13 +59,16 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<New.ResponseBean.ResultsBean>> loader, ArrayList<New.ResponseBean.ResultsBean> data) {
-        if (data == null)
-            return;
-        
+        mainProgress.setVisibility(View.GONE);
+        emptyTextview.setText("无数据");
+        newsAdapter.clear();
+        if (data != null && !data.isEmpty()) {
+            newsAdapter.addAll(data);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<ArrayList<New.ResponseBean.ResultsBean>> loader) {
-
+        newsAdapter.clear();
     }
 }
