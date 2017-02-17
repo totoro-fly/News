@@ -1,8 +1,11 @@
 package com.totoro_fly.news;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,10 +29,11 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     TextView emptyTextview;
     @Bind(R.id.activity_news)
     LinearLayout activityNews;
-    private static final String NEWS_URL = "http://content.guardianapis.com/search?q=debates&api-key=test";
     NewsAdapter newsAdapter;
     @Bind(R.id.main_progress)
     ProgressBar mainProgress;
+    private static final String NEWS_URL = "http://content.guardianapis.com/search?q=debates&api-key=test";
+    private static final int NEWS_LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +47,22 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 New.ResponseBean.ResultsBean n = (New.ResponseBean.ResultsBean) newsAdapter.getItem(i);
-                Uri uri = Uri.parse(n.getApiUrl());
+                Uri uri = Uri.parse(n.getWebUrl());
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 }
             }
         });
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+            getLoaderManager().initLoader(NEWS_LOADER_ID, null, this);
+        } else {
+            mainProgress.setVisibility(View.GONE);
+            emptyTextview.setText("无网络");
+        }
+
     }
 
     @Override

@@ -87,7 +87,7 @@ public class QueryUtils {
             line = bufferedReader.readLine();
             while (line != null) {
                 stringBuilder.append(line);
-                bufferedReader.readLine();
+                line=bufferedReader.readLine();
             }
         } catch (IOException e) {
             Log.d(TAG, "readFromInputstream", e);

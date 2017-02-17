@@ -39,9 +39,12 @@ public class NewsAdapter extends ArrayAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
         New.ResponseBean.ResultsBean n = (New.ResponseBean.ResultsBean) getItem(position);
+        String date = n.getWebPublicationDate();
+        date = date.replace("T", "");
+        date = date.replace("Z", "");
         viewHolder.mTitle.setText(n.getWebTitle());
         viewHolder.mType.setText(n.getType());
-        viewHolder.mDate.setText(n.getWebPublicationDate());
+        viewHolder.mDate.setText(date);
         return view;
     }
 }
